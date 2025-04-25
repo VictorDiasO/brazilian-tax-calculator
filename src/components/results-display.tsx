@@ -1,10 +1,35 @@
 "use client";
 
-import React from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableCaption } from '@/components/ui/table';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip as RechartsTooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
-import type { CalculatedTax, CalculatedCost } from '@/lib/profit-calculator'; // Import calculated types
+import React from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableCaption,
+} from "@/components/ui/table";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip as RechartsTooltip,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Legend,
+} from "recharts";
+import type { CalculatedTax, CalculatedCost } from "@/lib/profit-calculator"; // Import calculated types
 
 // --- Component Props ---
 export interface CalculationResults {
@@ -32,16 +57,89 @@ interface ResultsDisplayProps {
 
 // --- Helper Functions ---
 const formatCurrency = (value: number): string => {
-  return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 };
 
 const formatPercentage = (value: number): string => {
   return `${value.toFixed(2)}%`;
 };
 
-// --- Colors for Charts ---
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d']; // Blue, Green, Yellow, Orange, Purple, Teal
+const COLORS = [
+  "#0088FE",
+  "#00C49F",
+  "#FFBB28",
+  "#FF8042",
+  "#8884d8",
+  "#82ca9d",
+];
 
+// --- Colors for Charts ---
+
+// --- Data for table Formulas ---
+const getFormulaRows = (results: CalculationResults) => {
+    const {
+        productName,
+        quantity,
+        grossValuePerUnit,
+        grossTotalValue,
+        calculatedTaxes,
+        totalTaxValuePerUnit,
+        totalTaxValueTotal,
+        calculatedCosts,
+        totalFixedCosts,
+        totalVariableCostsPerUnit,
+        totalVariableCostsTotal,
+        totalCostValuePerUnit,
+        totalCostValueTotal,
+        realProfitPerUnit,
+        realProfitTotal,
+        profitMarginPercentage,
+    } = results;
+
+  return [
+    {
+      name: "Valor Bruto do Produto",
+      value: formatCurrency(grossValuePerUnit),
+      calculation: "Valor do produto antes de impostos e custos.",
+    },
+    ...calculatedTaxes.map((tax) => ({
+      name: `${tax.name}`,
+      value: formatCurrency(tax.valuePerUnit),
+      calculation: `(${formatPercentage(tax.rate)} de ${
+        tax.baseDisplay
+      }) = ${formatCurrency(tax.valuePerUnit)}`,
+    })),
+    {
+      name: "Total de Impostos",
+      value: formatCurrency(totalTaxValuePerUnit),
+      calculation: "Soma de todos os impostos.",
+    },
+    ...calculatedCosts.map((cost) => ({
+      name: `${cost.name} (${
+        cost.type === "fixed" ? "Fixo rateado" : "Variável"
+      })`,
+      value: formatCurrency(cost.valuePerUnit),
+      calculation:
+        cost.type === "fixed"
+          ? `(Custo Fixo Total / Quantidade) = ${formatCurrency(
+              cost.valuePerUnit
+            )}`
+          : `Custo Variável por Unidade = ${formatCurrency(cost.valuePerUnit)}`,
+    })),
+    {
+      name: "Total de Custos (Fixos + Variáveis)",
+      value: formatCurrency(totalCostValuePerUnit),
+      calculation: `Soma dos custos fixos e variáveis = ${formatCurrency(
+        totalCostValuePerUnit
+      )}`,
+    },
+    {
+      name: "Lucro Real (Líquido)",
+      value: formatCurrency(realProfitPerUnit),
+      calculation: `Valor Bruto - Total de Impostos - Total de Custos = ${formatCurrency(realProfitPerUnit)}`,
+    },
+  ];
+};
 
 // --- Component ---
 export function ResultsDisplay({ results }: ResultsDisplayProps) {
@@ -63,13 +161,22 @@ export function ResultsDisplay({ results }: ResultsDisplayProps) {
 
   // Data for Pie Chart (Composition of Price per Unit)
   const pieChartData = [
-    { name: 'Custo Produto (s/ Imp.)', value: grossValuePerUnit - totalTaxValuePerUnit - (totalCostValuePerUnit - totalTaxValuePerUnit)}, // Approximation: Value - Taxes - Variable Costs
-    { name: 'Impostos', value: totalTaxValuePerUnit },
-    { name: 'Custos (Fixos+Variáveis)', value: totalCostValuePerUnit - totalTaxValuePerUnit }, // Subtract taxes already included
-    { name: 'Lucro Real', value: realProfitPerUnit },
-  ].filter(item => item.value > 0); // Filter out zero or negative values for clarity
+    {
+      name: "Custo Produto (s/ Imp.)",
+      value:
+        grossValuePerUnit -
+        totalTaxValuePerUnit -
+        (totalCostValuePerUnit - totalTaxValuePerUnit),
+    }, // Approximation: Value - Taxes - Variable Costs
+    { name: "Impostos", value: totalTaxValuePerUnit },
+    {
+      name: "Custos (Fixos+Variáveis)",
+      value: totalCostValuePerUnit - totalTaxValuePerUnit,
+    }, // Subtract taxes already included
+    { name: "Lucro Real", value: realProfitPerUnit },
+  ].filter((item) => item.value > 0); // Filter out zero or negative values for clarity
 
-
+    
   // Data for Bar Chart (Total Values Breakdown) - simplified
    const barChartData = [
        {
@@ -81,13 +188,19 @@ export function ResultsDisplay({ results }: ResultsDisplayProps) {
        },
    ];
 
-
   return (
     <div className="space-y-6">
       {/* Summary Card */}
       <Card className="bg-primary/10 border-primary">
-         <CardHeader>
-           <CardTitle className="text-xl text-primary">Resumo do Cálculo para "{productName}" ({quantity} {quantity > 1 ? 'unidades' : 'unidade'})</CardTitle>
+        <CardHeader>
+          <CardTitle className="text-xl text-primary">
+            Resumo do Cálculo para "{productName}" (
+            {quantity}{" "}
+            {quantity > 1
+              ? "unidades"
+              : "unidade"}
+            )
+          </CardTitle>
          </CardHeader>
          <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               <div>
@@ -107,16 +220,17 @@ export function ResultsDisplay({ results }: ResultsDisplayProps) {
                  <p className="text-lg font-semibold">{formatCurrency(grossTotalValue)}</p>
               </div>
          </CardContent>
-      </Card>
-
+      </Card>      
 
       {/* Detailed Table */}
       <Card>
-        <CardHeader><CardTitle className="text-lg">Detalhamento por Unidade</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle className="text-lg">Detalhamento por Unidade</CardTitle>
+        </CardHeader>
         <CardContent>
           <Table>
             <TableCaption>Valores detalhados por unidade do produto.</TableCaption>
-            <TableHeader>
+              <TableHeader>
               <TableRow>
                 <TableHead className="w-[60%]">Descrição</TableHead>
                 <TableHead className="text-right">Valor (R$)</TableHead>
@@ -132,9 +246,16 @@ export function ResultsDisplay({ results }: ResultsDisplayProps) {
                 <TableCell colSpan={2} className="font-semibold text-muted-foreground">Impostos</TableCell>
               </TableRow>
               {calculatedTaxes.map((tax) => (
-                <TableRow key={tax.id}>
-                  <TableCell className="pl-6">{tax.name} ({formatPercentage(tax.rate)} sobre {tax.baseDisplay})</TableCell>
-                  <TableCell className="text-right">{formatCurrency(tax.valuePerUnit)}</TableCell>
+                <TableRow key={tax.id} >
+                  <TableCell className="pl-6">
+                    {tax.name} ({formatPercentage(tax.rate)} sobre{" "}
+                    {tax.baseDisplay})                  
+                  </TableCell>
+                  <TableCell className="text-right">
+                  {formatCurrency(tax.valuePerUnit)}
+                  </TableCell>
+                
+                  
                 </TableRow>
               ))}
                <TableRow>
@@ -146,9 +267,16 @@ export function ResultsDisplay({ results }: ResultsDisplayProps) {
                  <TableCell colSpan={2} className="font-semibold text-muted-foreground">Custos</TableCell>
               </TableRow>
               {calculatedCosts.map((cost) => (
-                <TableRow key={cost.id}>
-                  <TableCell className="pl-6">{cost.name} ({cost.type === 'fixed' ? `Fixo rateado` : 'Variável'})</TableCell>
-                  <TableCell className="text-right">{formatCurrency(cost.valuePerUnit)}</TableCell>
+                <TableRow key={cost.id} >
+                  <TableCell className="pl-6">
+                    {cost.name} (
+                    {cost.type === "fixed" ? `Fixo rateado` : "Variável"})
+                  </TableCell>
+                  <TableCell className="text-right">
+                  {formatCurrency(cost.valuePerUnit)}
+                  </TableCell>
+                   
+                  
                 </TableRow>
               ))}
               <TableRow>
@@ -156,20 +284,50 @@ export function ResultsDisplay({ results }: ResultsDisplayProps) {
                  <TableCell className="text-right font-semibold">{formatCurrency(totalCostValuePerUnit)}</TableCell>
               </TableRow>
               {/* Final Profit */}
-               <TableRow className="bg-green-100 dark:bg-green-900/50">
-                 <TableCell className="font-bold text-lg text-green-800 dark:text-green-300">Lucro Real (Líquido)</TableCell>
-                 <TableCell className="text-right font-bold text-lg text-green-800 dark:text-green-300">{formatCurrency(realProfitPerUnit)}</TableCell>
-               </TableRow>
+              <TableRow className="bg-green-100 dark:bg-green-900/50">
+                <TableCell className="font-bold text-lg text-green-800 dark:text-green-300">
+                  Lucro Real (Líquido)
+                </TableCell>
+                <TableCell className="text-right font-bold text-lg text-green-800 dark:text-green-300">
+                  {formatCurrency(realProfitPerUnit)}
+                </TableCell>
+              </TableRow>
             </TableBody>
           </Table>
         </CardContent>
       </Card>
 
-      {/* Charts */}
-       <Card>
-         <CardHeader><CardTitle className="text-lg">Visualização Gráfica (por Unidade)</CardTitle></CardHeader>
+      {/* Formulas Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Como chegamos nesses Valores</CardTitle>
+        </CardHeader>
+          <CardContent>
+              <Table>
+                  <TableCaption>Detalhes das fórmulas utilizadas para chegar aos valores unitários.</TableCaption>
+                  <TableHeader>
+                      <TableRow>
+                          <TableHead className="w-[40%]">Descrição</TableHead>
+                          <TableHead className="text-right">Valor (R$)</TableHead>
+                          <TableHead>Cálculo</TableHead>
+                      </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                      {getFormulaRows(results).map((row, index) => (
+                          <TableRow key={index}>
+                              <TableCell className="font-medium">{row.name}</TableCell>
+                              <TableCell className="text-right">{row.value}</TableCell>
+                              <TableCell>{row.calculation}</TableCell>
+                          </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
+            </CardContent>
+        </Card>
+        <Card>
+         <CardHeader><CardTitle className="text-lg">Visualização Gráfica (por Unidade)</CardTitle>
+         </CardHeader>
          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-           {/* Pie Chart */}
            <div className="h-[300px] w-full">
                 <p className="text-center font-medium mb-2">Composição do Preço de Venda (Unitário)</p>
              <ResponsiveContainer width="100%" height="100%">
@@ -203,8 +361,6 @@ export function ResultsDisplay({ results }: ResultsDisplayProps) {
                </PieChart>
              </ResponsiveContainer>
            </div>
-
-           {/* Bar Chart - Simplified to show total breakdown */}
            <div className="h-[300px] w-full">
                 <p className="text-center font-medium mb-2">Detalhamento dos Valores Totais</p>
                <ResponsiveContainer width="100%" height="100%">
@@ -221,8 +377,8 @@ export function ResultsDisplay({ results }: ResultsDisplayProps) {
                     </BarChart>
                 </ResponsiveContainer>
            </div>
-         </CardContent>
-       </Card>
+          </CardContent>
+        </Card>
     </div>
   );
 }
