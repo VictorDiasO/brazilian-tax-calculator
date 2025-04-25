@@ -2,27 +2,35 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: Arial, Helvetica, sans-serif;
-}
-
 @layer base {
   :root {
-    --background: 0 0% 100%; /* White */
-    --foreground: 240 10% 3.9%; /* Dark Gray */
-    --card: 0 0% 100%; /* White */
-    --card-foreground: 240 10% 3.9%; /* Dark Gray */
+    --background: 220 14% 96%; /* Light Gray */
+    --foreground: 220 10% 20%; /* Darker Gray */
+    --card: 0 0% 100%; /* White for cards */
+    --card-foreground: 220 10% 20%; /* Darker Gray */
     --popover: 0 0% 100%; /* White */
-    --popover-foreground: 240 10% 3.9%; /* Dark Gray */
-    --primary: 221.2 83.2% 53.3%; /* Professional Blue */
-    --primary-foreground: 210 40% 98%; /* Light color for text on primary */
-    --secondary: 240 4.8% 95.9%; /* Light Gray */
-    --secondary-foreground: 240 5.9% 10%; /* Dark Gray */
-    --muted: 240 4.8% 95.9%; /* Light Gray */
-    --muted-foreground: 240 3.8% 46.1%; /* Medium Gray */
-    --accent: 240 4.8% 95.9%; /* Light Gray (can be changed if needed, but using primary for actions) */
-    --accent-foreground: 240 5.9% 10%; /* Dark Gray */
-    --destructive: 0 84.2% 60.2%; /* Red */
+    --popover-foreground: 220 10% 20%; /* Darker Gray */
+    --primary: 210 80% 50%; /* Light Blue */
+    --primary-foreground: 0 0% 100%; /* White for contrast */
+    --secondary: 150 40% 95%; /* Light Green */
+    --secondary-foreground: 220 10% 20%; /* Darker Gray */
+    --muted: 220 20% 95%; /* Soft Gray */
+    --muted-foreground: 220 10% 40%; /* Medium Gray */
+    --accent: 220 20% 90%; /* Light Gray for accents */
+    --accent-foreground: 220 10% 20%; /* Darker Gray */
+    --destructive: 0 70% 50%; /* Red (less saturated) */
+    --destructive-foreground: 0 0% 100%; /* White for contrast */
+    --border: 220 10% 85%; /* Light Gray Border */
+    --input: 220 10% 85%; /* Light Gray Input Border */
+    --ring: 210 80% 50%; /* Light Blue for focus */
+    --chart-1: 210 80% 50%; /* Blue */
+    --chart-2: 150 60% 40%; /* Green */
+    --chart-3: 43.2 95.5% 56.9%; /* Yellow */
+    --chart-4: 270.0 70.0% 50.0%; /* Purple */
+    --chart-5: 0 72.2% 50.6%; /* Red */
+    --radius: 0.5rem;
+        
+    --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%; /* Light color for text on destructive */
     --border: 240 5.9% 90%; /* Gray Border */
     --input: 240 5.9% 90%; /* Gray Input Border */
@@ -43,27 +51,27 @@ body {
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
   .dark {
-    --background: 240 10% 3.9%; /* Dark Gray */
-    --foreground: 0 0% 98%; /* Almost White */
-    --card: 240 10% 3.9%; /* Dark Gray */
-    --card-foreground: 0 0% 98%; /* Almost White */
-    --popover: 240 10% 3.9%; /* Dark Gray */
-    --popover-foreground: 0 0% 98%; /* Almost White */
-    --primary: 217.2 91.2% 59.8%; /* Brighter Blue for dark mode */
-    --primary-foreground: 210 40% 98%; /* Light color for text on primary */
-    --secondary: 240 3.7% 15.9%; /* Darker Gray */
-    --secondary-foreground: 0 0% 98%; /* Almost White */
-    --muted: 240 3.7% 15.9%; /* Darker Gray */
-    --muted-foreground: 240 5% 64.9%; /* Lighter Medium Gray */
-    --accent: 240 3.7% 15.9%; /* Darker Gray */
-    --accent-foreground: 0 0% 98%; /* Almost White */
-    --destructive: 0 62.8% 30.6%; /* Darker Red */
-    --destructive-foreground: 0 0% 98%; /* Light color for text on destructive */
-    --border: 240 3.7% 15.9%; /* Darker Gray Border */
-    --input: 240 3.7% 15.9%; /* Darker Gray Input Border */
-    --ring: 217.2 91.2% 59.8%; /* Brighter Blue for focus rings */
-    --chart-1: 217.2 91.2% 59.8%; /* Blue */
-    --chart-2: 160.1 71.4% 39.8%; /* Teal */
+    --background: 220 10% 10%; /* Darker Gray */
+    --foreground: 0 0% 90%; /* Lighter Gray */
+    --card: 220 10% 15%; /* Dark Card Background */
+    --card-foreground: 0 0% 90%; /* Lighter Gray */
+    --popover: 220 10% 15%; /* Dark Popover */
+    --popover-foreground: 0 0% 90%; /* Lighter Gray */
+    --primary: 210 80% 60%; /* Brighter Light Blue */
+    --primary-foreground: 0 0% 100%; /* White for contrast */
+    --secondary: 150 40% 20%; /* Dark Green */
+    --secondary-foreground: 0 0% 90%; /* Lighter Gray */
+    --muted: 220 20% 15%; /* Dark Soft Gray */
+    --muted-foreground: 220 10% 60%; /* Medium Gray */
+    --accent: 220 20% 20%; /* Dark Accent */
+    --accent-foreground: 0 0% 90%; /* Lighter Gray */
+    --destructive: 0 70% 50%; /* Red (less saturated) */
+    --destructive-foreground: 0 0% 100%; /* White for contrast */
+    --border: 220 10% 25%; /* Darker Gray Border */
+    --input: 220 10% 25%; /* Darker Gray Input Border */
+    --ring: 210 80% 60%; /* Brighter Light Blue for focus */
+    --chart-1: 210 80% 60%; /* Blue */
+    --chart-2: 150 60% 40%; /* Green */
     --chart-3: 43.2 95.5% 56.9%; /* Yellow */
     --chart-4: 270.0 70.0% 50.0%; /* Purple */
     --chart-5: 0 72.2% 50.6%; /* Red */
@@ -84,5 +92,11 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+    
   }
+}
+
+.good-number {
+  color: hsl(var(--secondary)); /* Use a green color from the theme */
 }
